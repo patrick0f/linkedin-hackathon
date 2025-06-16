@@ -1,24 +1,29 @@
-import mongoose, { Connection } from "mongoose";
-import dotenv from 'dotenv';
+import { Pool } from 'pg';
 
-dotenv.config();
+const databaseUrl = process.env.DATABASE_URL!;
 
-let isConnected: Connection | boolean = false;
+if (!databaseUrl) {
+  throw new Error('Missing DATABASE_URL environment variable');
+}
 
-const connectDB = async () => {
-    if (isConnected) {
-        console.log("MongoDB already connected");
-        return isConnected;
-    }
-    try {
-        const res = await mongoose.connect(process.env.MONGO_URI!);
-        isConnected = res.connection;
-        console.log("MongoDB connected successfully");
-        return isConnected;
-    } catch (error) {
-        console.error("MongoDB connection error:", error);
-        throw error;
-    }
-};
+export const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
-export default connectDB; 
+export default async function connectDB() {
+  try {
+    // Test the connection
+    const client = await pool.connect();
+    await client.query('SELECT NOW()');
+    client.release();
+    
+    console.log('Connected to PostgreSQL via Supabase');
+    return pool;
+  } catch (error) {
+    console.error('Failed to connect to PostgreSQL:', error);
+    throw error;
+  }
+} 

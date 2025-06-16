@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './lib/db';
+import postsRouter from './routes/posts';
 
 dotenv.config();
 
@@ -22,7 +23,9 @@ connectDB()
     process.exit(1);
   });
 
-// Routes will be added here
+// Routes
+app.use('/api/posts', postsRouter);
+
 app.get('/', (req, res) => {
   res.json({ message: 'LinkedIn Clone API' });
 });
