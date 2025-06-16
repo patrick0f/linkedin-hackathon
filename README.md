@@ -2,21 +2,17 @@
 
 ## 🚀 Overview
 
-This project reimagines LinkedIn’s social experience for college students and new users. Our goal is to empower new users to explore and adopt LinkedIn features through a **gamified onboarding experience**, while fostering meaningful professional relationships via a **built-in Coffee Chat Scheduler** integrated with calendar tools.
+This project reimagines LinkedIn's social experience for college students and new users. Our goal is to empower new users to explore and adopt LinkedIn features through a **gamified onboarding experience**, while fostering meaningful professional relationships via a **built-in Coffee Chat Scheduler** integrated with calendar tools.
 
 By turning discovery into a game and enabling seamless in-app networking, we help LinkedIn become not just a profile builder, but a platform for personal growth and career momentum.
-
----
 
 ## 🎯 Problem Statement
 
 LinkedIn offers powerful tools—posting, joining groups, following industry leaders, connecting with professionals—but college students are often unaware of these features.
 
-> **Pain Point:** Many students sign up for LinkedIn but stop at creating a profile. They don’t know what to do next, and LinkedIn doesn’t actively guide them.
+> **Pain Point:** Many students sign up for LinkedIn but stop at creating a profile. They don't know what to do next, and LinkedIn doesn't actively guide them.
 
 > **Result:** Dormant accounts, missed opportunities, and impersonal networking.
-
----
 
 ## 💡 Our Solution
 
@@ -33,8 +29,6 @@ We designed a **two-pronged feature upgrade** that addresses discoverability and
 - Users build **coffee chat streaks**—encouraging ongoing dialogue and real relationships.
 - Streak points unlock profile banners and social rewards.
 
----
-
 ## 🧑‍💻 User Journey
 
 1. **Create an account**
@@ -43,27 +37,69 @@ We designed a **two-pronged feature upgrade** that addresses discoverability and
 4. **Schedule coffee chats with AI help**
 5. **Maintain streaks to earn profile enhancements**
 
----
-
 ## 🧪 Tech Stack
 
-- **Frontend:** React + Tailwind (or Ant Design UI Kit)
-- **Backend:** Node.js + Express (Prisma API optional)
-- **AI Matchmaking:** Python (or Copilot-assisted scheduling logic)
-- **Calendar Integration:** Calendly API (or similar)
-- **Database:** PostgreSQL or Supabase
+- **Frontend:** Next.js, TypeScript, Tailwind CSS
+- **Backend:** Express, TypeScript, MongoDB
+- **Authentication:** Clerk
+- **Database:** MongoDB
+- **AI Integration:** OpenAI API
+- **Calendar Integration:** Calendly API
 - **Version Control:** GitHub
 
----
+## 📦 Project Structure
 
-## 📦 Repository Structure
+```
+linkedin-hackathon/
+├── frontend/           # Next.js frontend
+│   ├── app/           # Next.js app directory
+│   ├── components/    # React components
+│   └── types/         # TypeScript type definitions
+└── backend/           # Express backend
+    ├── src/
+    │   ├── models/    # Database models
+    │   ├── lib/       # Utilities
+    │   └── index.ts   # Main entry point
+```
 
-/src # Frontend and backend code
-/tests # Unit and integration tests
-/docs # Wireframes, mockups, and diagrams
-README.md # You're here!
+## 🚀 Setup
 
----
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+## 🔑 Environment Variables
+
+### Frontend (.env)
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
+```
+
+### Backend (.env)
+```
+PORT=5000
+MONGO_URI=your_mongodb_uri
+NODE_ENV=development
+```
+
+## ✨ Features
+- User authentication with Clerk
+- Create and manage posts
+- Like and comment on posts
+- Real-time updates
+- Responsive design
+- Gamified onboarding system
+- AI-powered coffee chat scheduling
 
 ## 🎨 Designs & Wireframes
 
@@ -71,19 +107,15 @@ README.md # You're here!
 - Premium-unlock modal with CTA
 - Coffee Chat Scheduler UI
 - Profile streak banners (design mockups in `/docs/wireframes`)
----
 
 ## 🎥 Demo (2 min video)
 [Insert link to demo video]
----
 
 ## 🔮 Future Vision
 
-- Expand gamification to recruiters (e.g., points for responding to students).
-- AI-generated content tips based on profile goals.
+- Expand gamification to recruiters (e.g., points for responding to students)
+- AI-generated content tips based on profile goals
 - Custom AI coach for career suggestions
-
----
 
 ## 📚 References
 
@@ -91,8 +123,6 @@ README.md # You're here!
 - Calendly API Docs: https://developer.calendly.com/
 - OpenAI Copilot & ChatGPT API (for AI matching logic)
 - [Hackathon Brief & Rules](/docs/2025%20Hackathon%20-%20LinkedIn%20Possibilities%20in%20Tech.pdf)
-
----
 
 ## 🙌 Team Social (LinkedIn Social Track)
 - **Kemi** – Harvard University
