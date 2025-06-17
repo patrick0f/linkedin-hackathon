@@ -1,17 +1,13 @@
-import { IPost } from '@/types/post'
+import { IPostDocument } from '@/models/post.model'
 import React from 'react'
-import Comment from './Comment'
-import { useUser } from '@clerk/nextjs'
-
-const Comments = ({post}:{post:IPost}) => {
-  const { user } = useUser();
-  
+import Comment from './Comment' 
+const Comments = ({post}:{post:IPostDocument}) => {
   return (
     <div> 
         {
-            post?.Comments?.map((comment: string, index: number)=>{
+            post?.comments?.map((comment: any)=>{
                 return (
-                    <Comment key={index} comment={comment} user={user}/>
+                    <Comment key={comment._id} comment={comment}/>
                 )
             })
         } 

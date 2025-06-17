@@ -4,7 +4,7 @@ import ProfilePhoto from "./shared/ProfilePhoto";
 import { useUser } from "@clerk/nextjs";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { createCommentAction } from "../lib/serveractions";
+import { createCommentAction } from "@/lib/serveractions";
 import { toast } from "react-toastify";
 
 const CommentInput = ({ postId }: { postId: string }) => {
@@ -15,8 +15,7 @@ const CommentInput = ({ postId }: { postId: string }) => {
         toast.error("Please Login First");
         return;
       }
-      formData.append('postId', postId);
-      await createCommentAction(formData);
+      await createCommentAction(postId, formData);
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
@@ -28,7 +27,7 @@ const CommentInput = ({ postId }: { postId: string }) => {
         <ProfilePhoto src={user?.imageUrl!} />
         <Input
           type="text"
-          name="comment"
+          name="inputText"
           placeholder="Add a comment"
           className="rounded-full"
         />
