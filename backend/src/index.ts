@@ -9,10 +9,17 @@ import usersRouter from './routes/users';
 
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5179;
+
+// CORS configuration for development
+const corsOptions = {
+  origin: ['http://localhost:5179', 'http://127.0.0.1:5179'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Connect to Supabase
