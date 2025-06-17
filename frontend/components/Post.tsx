@@ -5,43 +5,52 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { Trash2 } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { IPostDocument } from "@/models/post.model";
+import { IPost } from "@/types/post";
 import PostContent from "./PostContent";
 import SocialOptions from "./SocialOptions";
 import ReactTimeago from "react-timeago";
-import { deletePostAction } from "@/lib/serveractions";
+import { deletePostAction } from "../lib/serveractions";
 
-const Post = ({ post }: { post: IPostDocument }) => {
+const Post = ({ post }: { post: IPost }) => {
   const { user } = useUser();
-  const fullName = post?.user?.firstName + " " + post?.user?.lastName;
-  const loggedInUser = user?.id === post?.user?.userId;
+  // Note: You'll need to fetch user details separately since posts_activity only has user_id
+  const loggedInUser = user?.id === post?.user_id;
 
   return (
     <div className="bg-white my-2 mx-2 md:mx-0 rounded-lg border border-gray-300">
       <div className=" flex gap-2 p-4">
-        <ProfilePhoto src={post?.user?.profilePhoto!} />
+        <ProfilePhoto src={user?.imageUrl || "./default-avatar.png"} />
         <div className="flex items-center justify-between w-full">
           <div>
             <h1 className="text-sm font-bold">
-              {fullName}{" "}
-              <Badge variant={"secondary"} className="ml-2">
-                You
-              </Badge>
+              {user?.firstName} {user?.lastName}{" "}
+              {loggedInUser && (
+                <Badge variant={"secondary"} className="ml-2">
+                  You
+                </Badge>
+              )}
             </h1>
             <p className="text-xs text-gray-500">
               @{user?.username || "username"}
             </p>
 
             <p className="text-xs text-gray-500">
-              <ReactTimeago date={new Date(post.createdAt)} />
+              {post.created_at && <ReactTimeago date={new Date(post.created_at)} />}
             </p>
           </div>
         </div>
         <div>
           {loggedInUser && (
             <Button
-              onClick={() => {
-                const res = deletePostAction(post._id);
+              onClick={async () => {
+                try {
+                  const formData = new FormData();
+                  formData.append('postId', post.id);
+                  formData.append('userId', user.id);
+                  await deletePostAction(formData);
+                } catch (error) {
+                  console.error('Error deleting post:', error);
+                }
               }}
               size={"icon"}
               className="rounded-full"
