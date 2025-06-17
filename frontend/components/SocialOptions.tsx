@@ -16,6 +16,7 @@ import { useUser } from "@clerk/nextjs";
 import CommentInput from "./CommentInput";
 import Comments from "./Comments";
 import { toast } from "react-toastify";
+import { likePost } from "@/lib/api";
 
 interface SocialOptionsProps {
   post: IPost;
@@ -24,7 +25,7 @@ interface SocialOptionsProps {
 const SocialOptions = ({ post }: SocialOptionsProps) => {
   const { user } = useUser();
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(post.likes);
+  const [likes, setLikes] = useState(post.num_of_likes || 0);
   const [commentOpen, setCommentOpen] = useState(false);
 
   /**
@@ -42,37 +43,17 @@ const SocialOptions = ({ post }: SocialOptionsProps) => {
     const tempLikes = likes;
     
     // Optimistically update UI
-    const dislike = likes?.filter((userId) => userId !== user.id);
-    const like = [...(likes ?? []), user.id];
-    const newLike = liked ? dislike : like;
+    const newLikeCount = liked ? likes - 1 : likes + 1;
     setLiked(!liked);
-    setLikes(newLike);
+    setLikes(newLikeCount);
 
     try {
       // Update like status on server
-      const res = await fetch(
-        `/api/posts/${post._id}/${liked ? "/dislike" : "/like"}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user.id),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to update like status");
-      }
-
-      // Fetch updated likes from server
-      const fetchAllLikes = await fetch(`/api/posts/${post._id}/like`);
-      if (!fetchAllLikes.ok) {
-        throw new Error("Failed to fetch updated likes");
-      }
-
-      const likeData = await fetchAllLikes.json();
-      setLikes(likeData);
+      const action = liked ? 'decrement' : 'increment';
+      const updatedPost = await likePost(post.id, action);
+      
+      // Update with server response
+      setLikes(updatedPost.num_of_likes);
     } catch (error) {
       // Rollback on error
       setLiked(tempLiked);
@@ -84,17 +65,17 @@ const SocialOptions = ({ post }: SocialOptionsProps) => {
   return (
     <div>
       <div className="text-sm mx-2 p-2 flex items-center justify-between border-b border-gray-300">
-        {likes && likes.length > 0 && (
+        {likes > 0 && (
           <p className="text-xm text-gray-500 hover:text-blue-500 hover:underline hover:cursor-pointer">
-            {likes.length} likes
+            {likes} likes
           </p>
         )}
-        {post.comments && post.comments.length > 0 && (
+        {post.Comments && post.Comments.length > 0 && (
           <p
             onClick={() => setCommentOpen(!commentOpen)}
             className="text-xm text-gray-500 hover:text-blue-500 hover:underline hover:cursor-pointer"
           >
-            {post.comments.length} message
+            {post.Comments.length} message
           </p>
         )}
       </div>
@@ -132,7 +113,7 @@ const SocialOptions = ({ post }: SocialOptionsProps) => {
       </div>
       {commentOpen && (
         <div className="p-4">
-          <CommentInput postId={post._id.toString()} />
+          <CommentInput postId={post.id} />
           <Comments post={post} />
         </div>
       )}
