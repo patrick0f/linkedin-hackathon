@@ -1,21 +1,16 @@
 export interface IPost {
-  _id: string;
-  description: string;
-  user: {
-    userId: string;
-    profilePhoto: string;
-    firstName: string;
-    lastName: string;
-  };
-  imageUrl?: string;
-  likes?: string[];
-  comments?: IComment[];
-  createdAt: string;
-  updatedAt: string;
+  id: string;
+  user_id: string;
+  post_text: string;
+  "Picture link"?: string;
+  Comments?: string[];
+  num_of_likes?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface IComment {
-  _id: string;
+  id: string;
   text: string;
   user: {
     userId: string;
