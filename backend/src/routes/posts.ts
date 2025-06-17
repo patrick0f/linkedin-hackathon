@@ -1,5 +1,5 @@
 import express from 'express';
-import { pool } from '../lib/db';
+import { supabase } from '../lib/db';
 import { IPost } from '../models/post.model';
 import { IComment } from '../models/comment.model';
 
@@ -8,9 +8,15 @@ const router = express.Router();
 // Get all posts
 router.get('/', async (req, res) => {
   try {
-    const { rows: posts } = await pool.query(
-      'SELECT * FROM posts ORDER BY created_at DESC'
-    );
+    const { data: posts, error } = await supabase
+      .from('posts_activity')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching posts' });
@@ -20,52 +26,85 @@ router.get('/', async (req, res) => {
 // Create a new post
 router.post('/', async (req, res) => {
   try {
-    const { description, user, imageUrl } = req.body;
-    const { rows } = await pool.query(
-      'INSERT INTO posts (description, user, image_url) VALUES ($1, $2, $3) RETURNING *',
-      [description, JSON.stringify(user), imageUrl]
-    );
-    res.status(201).json(rows[0]);
+    const { post_text, user_id, picture_link, comments, num_of_likes } = req.body;
+    const { data, error } = await supabase
+      .from('posts_activity')
+      .insert([
+        {
+          user_id,
+          post_text,
+          "Picture link": picture_link,
+          Comments: comments || [],
+          num_of_likes: num_of_likes || 0
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ message: 'Error creating post' });
   }
 });
 
-// Like/unlike a post
+// Get posts by user
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { data: posts, error } = await supabase
+      .from('posts_activity')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user posts' });
+  }
+});
+
+// Update post likes
 router.patch('/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.body;
+    const { action } = req.body; // 'increment' or 'decrement'
     
-    // Get current post
-    const { rows } = await pool.query(
-      'SELECT likes FROM posts WHERE id = $1',
-      [id]
-    );
+    const { data: currentPost, error: fetchError } = await supabase
+      .from('posts_activity')
+      .select('num_of_likes')
+      .eq('id', id)
+      .single();
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Post not found' });
+    if (fetchError) {
+      throw fetchError;
     }
 
-    // Update likes
-    const currentLikes = rows[0].likes || [];
-    const likeIndex = currentLikes.indexOf(userId);
-    let newLikes;
-    
-    if (likeIndex > -1) {
-      newLikes = currentLikes.filter((like: string) => like !== userId);
-    } else {
-      newLikes = [...currentLikes, userId];
+    const newLikeCount = action === 'increment' 
+      ? (currentPost.num_of_likes || 0) + 1
+      : Math.max(0, (currentPost.num_of_likes || 0) - 1);
+
+    const { data: updatedPost, error: updateError } = await supabase
+      .from('posts_activity')
+      .update({ num_of_likes: newLikeCount })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
     }
 
-    const { rows: updatedRows } = await pool.query(
-      'UPDATE posts SET likes = $1 WHERE id = $2 RETURNING *',
-      [newLikes, id]
-    );
-
-    res.json(updatedRows[0]);
+    res.json(updatedPost);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating like' });
+    res.status(500).json({ message: 'Error updating post likes' });
   }
 });
 
@@ -73,37 +112,53 @@ router.patch('/:id/like', async (req, res) => {
 router.get('/:id/comments', async (req, res) => {
   try {
     const { id } = req.params;
-    const { rows: comments } = await pool.query(
-      'SELECT * FROM comments WHERE post_id = $1 ORDER BY created_at DESC',
-      [id]
-    );
+    const { data: comments, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
     res.json(comments);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching comments' });
   }
 });
 
-// Add comment to a post
-router.post('/:id/comments', async (req, res) => {
+// Add comment to post
+router.post('/:id/comment', async (req, res) => {
   try {
     const { id } = req.params;
-    const { text, user } = req.body;
+    const { comment } = req.body;
     
-    // Check if post exists
-    const { rows: postRows } = await pool.query(
-      'SELECT id FROM posts WHERE id = $1',
-      [id]
-    );
+    const { data: currentPost, error: fetchError } = await supabase
+      .from('posts_activity')
+      .select('Comments')
+      .eq('id', id)
+      .single();
 
-    if (postRows.length === 0) {
-      return res.status(404).json({ message: 'Post not found' });
+    if (fetchError) {
+      throw fetchError;
     }
 
-    const { rows } = await pool.query(
-      'INSERT INTO comments (text, user, post_id) VALUES ($1, $2, $3) RETURNING *',
-      [text, JSON.stringify(user), id]
-    );
-    res.json(rows[0]);
+    const currentComments = currentPost.Comments || [];
+    const newComments = [...currentComments, comment];
+
+    const { data: updatedPost, error: updateError } = await supabase
+      .from('posts_activity')
+      .update({ Comments: newComments })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    res.json(updatedPost);
   } catch (error) {
     res.status(500).json({ message: 'Error adding comment' });
   }

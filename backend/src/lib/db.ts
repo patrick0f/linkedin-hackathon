@@ -1,29 +1,31 @@
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const databaseUrl = process.env.DATABASE_URL!;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
-if (!databaseUrl) {
-  throw new Error('Missing DATABASE_URL environment variable');
+if (!supabaseUrl) {
+  throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL environment variable');
 }
 
-export const pool = new Pool({
-  connectionString: databaseUrl,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+if (!supabaseAnonKey) {
+  throw new Error('Missing EXPO_PUBLIC_SUPABASE_ANON_KEY environment variable');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default async function connectDB() {
   try {
     // Test the connection
-    const client = await pool.connect();
-    await client.query('SELECT NOW()');
-    client.release();
+    const { data, error } = await supabase.from('users').select('count').limit(1);
     
-    console.log('Connected to PostgreSQL via Supabase');
-    return pool;
+    if (error) {
+      throw error;
+    }
+    
+    console.log('Connected to Supabase');
+    return supabase;
   } catch (error) {
-    console.error('Failed to connect to PostgreSQL:', error);
+    console.error('Failed to connect to Supabase:', error);
     throw error;
   }
 } 
