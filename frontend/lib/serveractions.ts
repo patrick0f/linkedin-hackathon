@@ -1,4 +1,4 @@
-import { getPosts, createPost, addComment } from './api';
+import { getPosts, createPost, addComment, getUsers } from './api';
 
 export const getAllPosts = async () => {
   try {
@@ -6,6 +6,16 @@ export const getAllPosts = async () => {
     return posts;
   } catch (error) {
     console.error('Error fetching posts:', error);
+    return [];
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const users = await getUsers();
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
     return [];
   }
 };
@@ -30,7 +40,7 @@ export const createPostAction = async (formData: FormData) => {
 
 export const createCommentAction = async (formData: FormData) => {
   try {
-    const comment = formData.get('comment') as string;
+    const comment = formData.get('inputText') as string;
     const postId = formData.get('postId') as string;
     
     if (!comment || !postId) {
@@ -47,16 +57,15 @@ export const createCommentAction = async (formData: FormData) => {
 
 export const deletePostAction = async (formData: FormData) => {
   try {
-    const postId = formData.get('postId') as string;
-    const userId = formData.get('userId') as string;
+    const postId = formData.get('id') as string;
     
-    if (!postId || !userId) {
+    if (!postId) {
       throw new Error('Missing required fields');
     }
     
     // Note: You'll need to add a deletePost function to your backend API
     // For now, this is a placeholder
-    console.log('Delete post action called for:', postId, 'by user:', userId);
+    console.log('Delete post action called for:', postId);
     return { success: true };
   } catch (error) {
     console.error('Error deleting post:', error);

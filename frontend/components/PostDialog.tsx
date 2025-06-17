@@ -26,6 +26,7 @@ import { readFileAsDataUrl } from "@/lib/utils";
 import Image from "next/image";
 import { createPost } from "@/lib/api";
 import { toast } from "react-toastify";
+import { useUser } from "@clerk/nextjs";
 
 // Type definition for component props
 interface PostDialogProps {
@@ -36,6 +37,7 @@ interface PostDialogProps {
 }
 
 export function PostDialog({ setOpen, open, src, fullName }: PostDialogProps) {
+  const { user } = useUser();
   // Refs and state management
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<string>("");
@@ -59,13 +61,18 @@ export function PostDialog({ setOpen, open, src, fullName }: PostDialogProps) {
   const postActionHandler = async (formData: FormData) => {
     const inputText = formData.get("inputText") as string;
     try {
-      await createPost(inputText, selectedFile);
+      if (!user?.id) {
+        toast.error("User not authenticated");
+        return;
+      }
+      await createPost(inputText, user.id, selectedFile);
       toast.success("Post Created Successfully");
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("Something went Wrong");
     }
     setInputText("");
+    setSelectedFile("");
     setOpen(false);
   };
 

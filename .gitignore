@@ -11,7 +11,16 @@ backend/node_modules/
 # next.js
 /.next/
 frontend/.next/
+frontend/.next/*
+.next/
+.next/*
+**/.next/
+**/.next/*
+
+# next.js build output
 /out/
+frontend/out/
+**/out/
 
 # production
 /build

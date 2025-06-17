@@ -72,4 +72,14 @@ export const getUserPosts = async (userId: string) => {
   }
   
   return response.json();
+};
+
+export const getUsers = async () => {
+  const response = await fetch(`${API_URL}/api/users`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+  
+  return response.json();
 }; 

@@ -1,13 +1,19 @@
 import { IPost } from '../types/post'
 import React from 'react'
-import Comment from './Comment' 
+
 const Comments = ({post}:{post:IPost}) => {
   return (
     <div> 
         {
-            post?.Comments?.map((comment: any)=>{
+            post?.Comments?.map((comment: string, index: number)=>{
                 return (
-                    <Comment key={comment.id} comment={comment}/>
+                    <div key={index} className='flex gap-2 my-4'>
+                        <div className='flex flex-1 justify-between p-3 bg-[#F2F2F2]'>
+                            <div>
+                                <p className='my-2'>{comment}</p>
+                            </div>
+                        </div>
+                    </div>
                 )
             })
         } 
