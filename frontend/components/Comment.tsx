@@ -1,9 +1,9 @@
-import { ICommentDocument } from '@/models/comment.model'
+import { IComment } from '../types/post'
 import React from 'react'
 import ProfilePhoto from './shared/ProfilePhoto'
 import ReactTimeago from 'react-timeago'
 
-const Comment = ({ comment }: { comment: ICommentDocument }) => {
+const Comment = ({ comment }: { comment: IComment }) => {
     return (
         <div className='flex gap-2 my-4'>
             <div className='mt-2'>
@@ -13,7 +13,7 @@ const Comment = ({ comment }: { comment: ICommentDocument }) => {
                 <div>
                     <h1 className='text-sm font-medium'>{`${comment?.user?.firstName} ${comment?.user?.lastName}`}</h1>
                     <p className='tex-xm text-gray-500'>@{comment?.user?.firstName}</p>
-                    <p className='my-2'>{comment.textMessage}</p>
+                    <p className='my-2'>{comment.text}</p>
                 </div>
                 <div>
                     <p className='text-xs text-gray-500'>

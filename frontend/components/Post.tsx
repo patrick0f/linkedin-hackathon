@@ -5,21 +5,21 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { Trash2 } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { IPostDocument } from "@/models/post.model";
+import { IUser, IPost } from "@/types/post";
 import PostContent from "./PostContent";
 import SocialOptions from "./SocialOptions";
 import ReactTimeago from "react-timeago";
 import { deletePostAction } from "@/lib/serveractions";
 
-const Post = ({ post }: { post: IPostDocument }) => {
+const Post = ({ post, user: postUser }: { post: IPost, user: IUser }) => {
   const { user } = useUser();
-  const fullName = post?.user?.firstName + " " + post?.user?.lastName;
-  const loggedInUser = user?.id === post?.user?.userId;
+  const fullName = postUser.firstName + " " + postUser.lastName;
+  const loggedInUser = user?.id === postUser.userId;
 
   return (
     <div className="bg-white my-2 mx-2 md:mx-0 rounded-lg border border-gray-300">
       <div className=" flex gap-2 p-4">
-        <ProfilePhoto src={post?.user?.profilePhoto!} />
+        <ProfilePhoto src={postUser.profilePhoto} />
         <div className="flex items-center justify-between w-full">
           <div>
             <h1 className="text-sm font-bold">
@@ -33,7 +33,7 @@ const Post = ({ post }: { post: IPostDocument }) => {
             </p>
 
             <p className="text-xs text-gray-500">
-              <ReactTimeago date={new Date(post.createdAt)} />
+              <ReactTimeago date={new Date(post.created_at || '')} />
             </p>
           </div>
         </div>
@@ -41,7 +41,9 @@ const Post = ({ post }: { post: IPostDocument }) => {
           {loggedInUser && (
             <Button
               onClick={() => {
-                const res = deletePostAction(post._id);
+                const formData = new FormData();
+                formData.append('id', post.id);
+                const res = deletePostAction(formData);
               }}
               size={"icon"}
               className="rounded-full"

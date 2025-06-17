@@ -15,14 +15,17 @@ const CommentInput = ({ postId }: { postId: string }) => {
         toast.error("Please Login First");
         return;
       }
-      await createCommentAction(postId, formData);
+      await createCommentAction(formData);
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
     }
   };
   return (
-    <form action={(formData) => commentActionHandler(formData)}>
+    <form action={(formData) => {
+      formData.append('postId', postId);
+      commentActionHandler(formData);
+    }}>
       <div className="flex items-center gap-2">
         <ProfilePhoto src={user?.imageUrl!} />
         <Input

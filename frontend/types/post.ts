@@ -1,3 +1,10 @@
+export interface IUser {
+  userId: string;
+  profilePhoto: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface IPost {
   id: string;
   user_id: string;
@@ -12,11 +19,6 @@ export interface IPost {
 export interface IComment {
   id: string;
   text: string;
-  user: {
-    userId: string;
-    profilePhoto: string;
-    firstName: string;
-    lastName: string;
-  };
+  user: IUser;
   createdAt: string;
 } 

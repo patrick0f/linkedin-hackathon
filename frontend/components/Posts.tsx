@@ -1,15 +1,17 @@
 import React from 'react'
 import Post from './Post'
-import { IPostDocument } from '@/models/post.model'
+import { IPost, IUser } from '@/types/post'
 
-const Posts = ({ posts }: { posts: IPostDocument[] }) => {
+const Posts = ({ posts, users }: { posts: IPost[], users: IUser[] }) => {
   
   return (
     <div>
       {
         posts?.map((post) => {
+          const user = users.find(u => u.userId === post.user_id);
+          if (!user) return null; // or a fallback UI
           return (
-            <Post key={post._id} post={post} />
+            <Post key={post.id} post={post} user={user} />
           )
         })
       }

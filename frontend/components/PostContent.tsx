@@ -1,15 +1,15 @@
-import { IPostDocument } from '@/models/post.model'
+import { IPost } from '@/types/post'
 import Image from 'next/image'
 import React from 'react'
 
-const PostContent = ({ post }: { post: IPostDocument }) => {
+const PostContent = ({ post }: { post: IPost }) => {
   return (
     <div className='my-3'>
-      <p className='my-3 px-4'>{post?.description}</p>
+      <p className='my-3 px-4'>{post?.post_text}</p>
       {
-        post?.imageUrl && (
+        post?.["Picture link"] && (
           <Image
-            src={post?.imageUrl}
+            src={post["Picture link"]}
             width={500}
             height={500}
             alt="post-image"
