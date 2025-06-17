@@ -16,7 +16,7 @@ import { useUser } from "@clerk/nextjs";
 import CommentInput from "./CommentInput";
 import Comments from "./Comments";
 import { toast } from "react-toastify";
-import { likePost } from "@/lib/api";
+import { postsApi } from "@/lib/api";
 
 interface SocialOptionsProps {
   post: IPost;
@@ -50,7 +50,7 @@ const SocialOptions = ({ post }: SocialOptionsProps) => {
     try {
       // Update like status on server
       const action = liked ? 'decrement' : 'increment';
-      const updatedPost = await likePost(post.id, action);
+      const updatedPost = await postsApi.likePost(post.id, action);
       
       // Update with server response
       setLikes(updatedPost.num_of_likes);

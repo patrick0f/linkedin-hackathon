@@ -24,7 +24,7 @@ import { Images } from "lucide-react";
 import { useRef, useState } from "react";
 import { readFileAsDataUrl } from "@/lib/utils";
 import Image from "next/image";
-import { createPost } from "@/lib/api";
+import { postsApi } from "@/lib/api";
 import { toast } from "react-toastify";
 
 // Type definition for component props
@@ -59,7 +59,22 @@ export function PostDialog({ setOpen, open, src, fullName }: PostDialogProps) {
   const postActionHandler = async (formData: FormData) => {
     const inputText = formData.get("inputText") as string;
     try {
+<<<<<<< Updated upstream
       await createPost(inputText, selectedFile);
+=======
+      if (!user?.id) {
+        toast.error("User not authenticated");
+        return;
+      }
+      await postsApi.create({
+        post_text: inputText,
+        user_id: user.id,
+        picture_link: selectedFile || undefined
+      });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
       toast.success("Post Created Successfully");
     } catch (error) {
       console.error("Error creating post:", error);

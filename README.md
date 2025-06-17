@@ -40,9 +40,9 @@ We designed a **two-pronged feature upgrade** that addresses discoverability and
 ## 🧪 Tech Stack
 
 - **Frontend:** Next.js, TypeScript, Tailwind CSS
-- **Backend:** Express, TypeScript, MongoDB
+- **Backend:** Express, TypeScript, Supabase
 - **Authentication:** Clerk
-- **Database:** MongoDB
+- **Database:** Supabase (PostgreSQL)
 - **AI Integration:** OpenAI API
 - **Calendar Integration:** Calendly API
 - **Version Control:** GitHub
@@ -51,46 +51,72 @@ We designed a **two-pronged feature upgrade** that addresses discoverability and
 
 ```
 linkedin-hackathon/
-├── frontend/           # Next.js frontend
+├── frontend/           # Next.js frontend (port 5179)
 │   ├── app/           # Next.js app directory
 │   ├── components/    # React components
+│   ├── lib/           # Utilities and API helpers
 │   └── types/         # TypeScript type definitions
-└── backend/           # Express backend
-    ├── src/
-    │   ├── models/    # Database models
-    │   ├── lib/       # Utilities
-    │   └── index.ts   # Main entry point
+├── backend/           # Express backend (port 5179)
+│   ├── src/
+│   │   ├── models/    # Database models
+│   │   ├── lib/       # Utilities
+│   │   ├── routes/    # API routes
+│   │   └── index.ts   # Main entry point
+└── package.json       # Root package.json for managing both services
 ```
 
 ## 🚀 Setup
 
-### Frontend
+### Quick Start (Recommended)
 ```bash
-cd frontend
-npm install
+# Install all dependencies
+npm run install:all
+
+# Run both frontend and backend on port 5179
 npm run dev
 ```
 
-### Backend
+### Individual Setup
+
+#### Frontend
+```bash
+cd frontend
+npm install
+npm run dev  # Runs on http://localhost:5179
+```
+
+#### Backend
 ```bash
 cd backend
 npm install
-npm run dev
+npm run dev  # Runs on http://localhost:5179
 ```
 
 ## 🔑 Environment Variables
 
-### Frontend (.env)
+### Frontend (.env.local)
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
+NEXT_PUBLIC_API_URL=http://localhost:5179
 ```
 
 ### Backend (.env)
 ```
-PORT=5000
-MONGO_URI=your_mongodb_uri
+PORT=5179
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
 NODE_ENV=development
 ```
+
+## 🌐 API Configuration
+
+Both frontend and backend are configured to run on **port 5179**:
+
+- **Frontend:** http://localhost:5179
+- **Backend API:** http://localhost:5179/api
+- **API Proxy:** Next.js automatically proxies `/api/*` requests to the backend
+
+The frontend includes a comprehensive API utility (`frontend/lib/api.ts`) for making requests to the backend.
 
 ## ✨ Features
 - User authentication with Clerk
