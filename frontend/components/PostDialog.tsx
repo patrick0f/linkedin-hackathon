@@ -73,7 +73,7 @@ export function PostDialog({ setOpen, open, src, fullName }: PostDialogProps) {
     <Dialog open={open}>
       <DialogContent
         onInteractOutside={() => setOpen(false)}
-        className="sm:max-w-[425px]"
+        className="sm:max-w-[424px]"
       >
         <DialogHeader>
           <DialogTitle className="flex gap-2">
